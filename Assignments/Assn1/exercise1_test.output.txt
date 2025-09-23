@@ -1,0 +1,9 @@
+[[ True  True  True]
+ [ True  True  True]
+ [ True  True  True]]
+
+(2.474873734152916-0.6123724356957944j)
+(7.999999999999998+0j)
+
+False
+True
