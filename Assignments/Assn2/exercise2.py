@@ -1,3 +1,7 @@
+# CS393 Quantum Algorithms - F25
+# Assignment 2 - 9_26_25
+# Matt Klassen, Instructor
+# Nixx Varboncoeur 
 import numpy
 import qiskit
 import math
