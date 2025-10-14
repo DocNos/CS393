@@ -1,0 +1,114 @@
+# Qiskit Programming Assignment #2 - Complete Guide
+
+## Assignment Overview
+**Due:** Friday, September 26  
+**Course:** MAT 399A, Fall 2025  
+**Required Libraries:** numpy, qiskit, math, cmath  
+**Important:** Cannot use qiskit.quantum_info class functionality  
+**Deliverable:** Single file named `exercise2.py` containing all three functions
+
+---
+
+## Key Concepts to Understand
+
+### 1. Qiskit Conventions
+- **Wire Ordering:** Top to bottom (qubit 0 on top, qubit n-1 on bottom)
+- **Basis Ordering:** Big-endian (for binary I = b_{n-1}...b_1b_0, basis vector is |b_{n-1}>...|b_1>|b_0>)
+
+### 2. Available Quantum Gates
+- **Pauli Gates:** X, Y, Z - Applied using `circuit.x(i)`, `circuit.y(i)`, `circuit.z(i)`
+- **Hadamard Gate:** H - Applied using `circuit.h(i)`
+- **Controlled-X (CNOT):** Applied using `circuit.cx(control, target)`
+- **Phase Shift:** P(θ) - Applied using `circuit.p(theta, i)`
+- **Multi-controlled X:** Applied using `circuit.mcx(control_list, target)`
+- **Barrier:** Visual separator using `circuit.barrier()`
+
+---
+
+## Task 1: Construct Quantum Circuit
+
+### Objective
+Create a 2-qubit quantum circuit that realizes the unitary transformation:
+```
+U = H⊗I ∘ CNOT_{1,0} ∘ I⊗Y ∘ H⊗H
+```
+
+### Step-by-Step Implementation
+
+1. **Parse the composition (read right to left):**
+   - First operation: H⊗H (Hadamard on both qubits)
+   - Second operation: I⊗Y (Y gate on qubit 1 only)
+   - Third operation: CNOT_{1,0} (control=qubit 1, target=qubit 0)
+   - Fourth operation: H⊗I (Hadamard on qubit 0 only)
+
+---
+
+## Task 2: Compute 4×4 Unitary Matrix
+
+### Objective
+Calculate the complete 4×4 unitary matrix for U in the computational basis.
+
+### Mathematical Background
+
+1. **Individual gate matrices:**
+   - H (Hadamard): `(1/√2) * [[1, 1], [1, -1]]`
+   - Y (Pauli-Y): `[[0, -i], [i, 0]]`
+   - X (Pauli-X): `[[0, 1], [1, 0]]`
+   - I (Identity): `[[1, 0], [0, 1]]`
+
+2. **Tensor product for 2-qubit gates:**
+   - For A⊗B where A acts on qubit 0 and B acts on qubit 1
+   - Result is 4×4 matrix with structure based on Kronecker product
+
+3. **CNOT matrix (control=1, target=0):**
+---
+
+## Task 3: Compute Output Probabilities
+
+### Objective
+Given an input state |ψ> = A₀₀|00> + A₀₁|01> + A₁₀|10> + A₁₁|11>, calculate the probability of each computational basis state after applying U.
+
+### Mathematical Process
+
+1. **Input state vector:** ψ = [A₀₀, A₀₁, A₁₀, A₁₁]ᵀ
+2. **Apply unitary:** ψ_out = U × ψ
+3. **Calculate probabilities:** P(|xy>) = |amplitude_xy|²
+
+
+
+---
+
+## Testing Your Solution
+
+1. **Create `exercise2.py`** with all three functions
+2. **Run the test driver:** `python exercise2_test.py`
+3. **Compare output** with `exercise2_test.output.txt`
+
+## Common Pitfalls to Avoid
+
+1. **Gate ordering:** Remember to apply gates from right to left when reading the composition
+2. **Tensor product ordering:** Be careful with qubit indexing in Kronecker products
+3. **CNOT control/target:** Ensure correct control and target qubits for CNOT_{1,0}
+4. **Complex numbers:** Use `dtype=complex` for numpy arrays
+5. **Probability calculation:** Use `abs(amplitude)**2`, not just `amplitude**2`
+
+## Debugging Tips
+
+1. **Verify each matrix separately** before composition
+2. **Check matrix dimensions** at each step (should be 4×4)
+3. **Test with simple input states** like |00> to verify behavior
+4. **Ensure probabilities sum to 1** (within numerical precision)
+5. **Print intermediate results** to trace calculations
+
+## Final Checklist
+
+- [ ] Q1 returns a QuantumCircuit object with 2 qubits
+- [ ] Q1 applies gates in correct order: H⊗H, I⊗Y, CNOT_{1,0}, H⊗I
+- [ ] Q2 returns a 4×4 numpy array (complex type)
+- [ ] Q2 uses matrix multiplication, not hard-coded final result
+- [ ] Q3 returns list of 4 probabilities
+- [ ] Q3 probabilities are real numbers (not complex)
+- [ ] All functions in single file `exercise2.py`
+- [ ] Only allowed imports used (numpy, qiskit, math, cmath)
+- [ ] No qiskit.quantum_info functions used
+- [ ] Test output matches expected output file

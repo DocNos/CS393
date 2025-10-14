@@ -1,0 +1,122 @@
+def examples():
+    # Quantum circuit with 2 qubit wires
+    qc = qiskit.QuantumCircuit(2)
+    # Add Hadamard gate to wire 0 of qc
+    qc.h(0)
+    # Pauli X, Y, Z gates
+    qc.x(0)
+    qc.y(0)
+    qc.z(0)
+    # Apply Pauli x gate to wires 0-2
+    qc.x(0,1,2)
+    # Controlled X gate controlled by wire 0 and targetting wire 1
+    qc.cx(0,1)
+    # Draw the circuit
+    qc.draw()
+
+
+```python
+def Q1():
+    """
+    returns:
+        qiskit quantum circuit on 2 qubits that realizes U
+    """
+    import qiskit
+    
+    # Create 2-qubit circuit
+    qc = qiskit.QuantumCircuit(2)
+    
+    # Apply operations in order (right to left from formula)
+    # Step 1: H⊗H
+    qc.h([0, 1])  # or qc.h(0); qc.h(1)
+    
+    # Optional: Add barrier for visual clarity
+    qc.barrier()
+    
+    # Step 2: I⊗Y (Y gate on qubit 1)
+    qc.y(1)
+    
+    # Step 3: CNOT_{1,0} (control=1, target=0)
+    qc.cx(1, 0)
+    
+    # Step 4: H⊗I (H gate on qubit 0)
+    qc.h(0)
+    
+    return qc
+```
+
+```
+CNOT_{1,0} = [[1, 0, 0, 0],
+              [0, 1, 0, 0],
+              [0, 0, 0, 1],
+              [0, 0, 1, 0]]
+```
+
+### Implementation Steps
+
+```python
+def Q2():
+    """
+    returns:
+        numpy matrix for U
+    """
+    import numpy as np
+    
+    # Define basic 2x2 matrices
+    H = np.array([[1, 1], [1, -1]], dtype=complex) / np.sqrt(2)
+    Y = np.array([[0, -1j], [1j, 0]], dtype=complex)
+    I = np.array([[1, 0], [0, 1]], dtype=complex)
+    
+    # Create 4x4 matrices for each operation
+    
+    # 1. H⊗H
+    H_H = np.kron(H, H)
+    
+    # 2. I⊗Y
+    I_Y = np.kron(I, Y)
+    
+    # 3. CNOT_{1,0} (control on qubit 1, target on qubit 0)
+    CNOT_10 = np.array([[1, 0, 0, 0],
+                         [0, 1, 0, 0],
+                         [0, 0, 0, 1],
+                         [0, 0, 1, 0]], dtype=complex)
+    
+    # 4. H⊗I
+    H_I = np.kron(H, I)
+    
+    # Compute composition (matrix multiplication from right to left)
+    U = H_I @ CNOT_10 @ I_Y @ H_H
+    
+    return U
+```
+
+### Implementation
+
+```python
+def Q3(A00, A01, A10, A11):
+    """
+    where:
+        A00,A01,A10,A11 : complex amplitudes of initial qubit register state
+    returns:
+        list [prob00,prob01,prob10,prob11] where probXY is the probability
+        that the final state is |XY> (X,Y=0,1)
+    """
+    import numpy as np
+    
+    # Get the unitary matrix from Q2
+    U = Q2()
+    
+    # Create input state vector
+    psi_in = np.array([A00, A01, A10, A11], dtype=complex)
+    
+    # Apply unitary transformation
+    psi_out = U @ psi_in
+    
+    # Calculate probabilities (|amplitude|²)
+    prob00 = abs(psi_out[0])**2
+    prob01 = abs(psi_out[1])**2
+    prob10 = abs(psi_out[2])**2
+    prob11 = abs(psi_out[3])**2
+    
+    return [prob00, prob01, prob10, prob11]
+```
