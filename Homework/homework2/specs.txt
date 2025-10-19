@@ -1,0 +1,263 @@
+================================================================================
+MAT 399 HOMEWORK 2 - 
+DEUTSCH-JOZSA IMPLEMENTATION SPECIFICATION
+================================================================================
+Due Date: Monday, October 7, 2025
+Assignment: Deutsch-Jozsa Qiskit Tutorial Modifications
+
+================================================================================
+OVERVIEW
+================================================================================
+This assignment requires modifying the Deutsch-Jozsa 
+algorithm implementation
+in Qiskit to create custom oracle functions based on 
+specified binary strings.
+The Deutsch-Jozsa algorithm determines whether a function 
+is constant or balanced with a single quantum measurement.
+
+================================================================================
+PREREQUISITES
+================================================================================
+[ ] Qiskit installed (pip install qiskit)
+[ ] Qiskit visualization tools (pip install qiskit[visualization])
+[ ] Python environment set up (3.8 or higher recommended)
+[ ] Access to Deutsch-Jozsa Qiskit tutorial
+[ ] Basic understanding of quantum gates and circuit notation
+[ ] Jupyter notebook or Python IDE ready
+
+================================================================================
+PROBLEM 1: MODIFY ORACLE GENERATING FUNCTION
+================================================================================
+
+Objective: Create a flexible oracle generator that 
+accepts a binary string as input
+
+Steps:
+------
+1. [ ] Locate the original oracle generating function 
+    in the tutorial
+2. [ ] Create a new function with signature:
+       def create_oracle_from_binary(binary_string, n_qubits)
+3. [ ] Validate input:
+       - Check binary_string length equals 2^n_qubits
+       - Verify string contains only '0' and '1'
+4. [ ] Implement oracle logic:
+       - Map each n-bit input to corresponding output bit
+       - Apply X gates where f(x) = 1
+5. [ ] Add print functionality:
+       - Print the binary string
+       - Print whether function is constant or balanced
+       - Print the truth table
+
+Implementation Checklist:
+------------------------
+[ ] Function accepts binary_string parameter
+[ ] Function accepts n_qubits parameter
+[ ] Input validation implemented
+[ ] Oracle circuit correctly implements the function
+[ ] Binary string is printed to console
+[ ] Function type (constant/balanced) is identified
+[ ] Code is well-commented
+
+Testing:
+--------
+[ ] Test with constant function (all 0s)
+[ ] Test with constant function (all 1s)
+[ ] Test with balanced function
+[ ] Test with invalid input lengths
+[ ] Verify oracle produces correct outputs
+
+================================================================================
+PROBLEM 2: N=3 ORACLE WITH BINARY STRING 11001100
+================================================================================
+
+Objective: Implement and visualize oracle for 3-qubit system
+
+Binary String Mapping:
+---------------------
+Input |000⟩ → 1
+Input |001⟩ → 1
+Input |010⟩ → 0
+Input |011⟩ → 0
+Input |100⟩ → 1
+Input |101⟩ → 1
+Input |110⟩ → 0
+Input |111⟩ → 0
+
+Steps:
+------
+1. [ ] Set n = 3 in your code
+2. [ ] Define binary_string = "11001100"
+3. [ ] Create oracle using modified function
+4. [ ] Generate Deutsch-Jozsa circuit with this oracle
+5. [ ] Create compressed circuit diagram
+6. [ ] Create uncompressed circuit diagram
+7. [ ] Save both diagrams as image files
+
+Circuit Diagram Requirements:
+----------------------------
+[ ] Compressed format showing:
+    - Oracle as single block
+    - Hadamard gates
+    - Measurement operations
+[ ] Uncompressed format showing:
+    - All individual gates in oracle
+    - Full gate decomposition
+    - Clear qubit labels
+[ ] Both diagrams properly labeled
+[ ] File naming: "n3_compressed.png" and "n3_uncompressed.png"
+
+Verification:
+------------
+[ ] Function is balanced (equal 0s and 1s)
+[ ] Circuit produces correct result
+[ ] Diagrams are clear and readable
+[ ] All 8 input combinations accounted for
+
+================================================================================
+PROBLEM 3: N=4 ORACLE WITH BINARY STRING 1100110011001100
+================================================================================
+
+Objective: Implement and visualize oracle for 4-qubit system
+
+Binary String Mapping:
+---------------------
+Input |0000⟩ → 1    Input |1000⟩ → 1
+Input |0001⟩ → 1    Input |1001⟩ → 1
+Input |0010⟩ → 0    Input |1010⟩ → 0
+Input |0011⟩ → 0    Input |1011⟩ → 0
+Input |0100⟩ → 1    Input |1100⟩ → 1
+Input |0101⟩ → 1    Input |1101⟩ → 1
+Input |0110⟩ → 0    Input |1110⟩ → 0
+Input |0111⟩ → 0    Input |1111⟩ → 0
+
+Steps:
+------
+1. [ ] Set n = 4 in your code
+2. [ ] Define binary_string = "1100110011001100"
+3. [ ] Create oracle using modified function
+4. [ ] Generate Deutsch-Jozsa circuit with this oracle
+5. [ ] Create compressed circuit diagram
+6. [ ] Create uncompressed circuit diagram
+7. [ ] Save both diagrams as image files
+
+Circuit Diagram Requirements:
+----------------------------
+[ ] Compressed format showing:
+    - Oracle as single block
+    - Hadamard gates on all qubits
+    - Measurement operations
+[ ] Uncompressed format showing:
+    - All individual gates in oracle
+    - May be complex - ensure readability
+    - Consider using transpile for optimization
+[ ] Both diagrams properly labeled
+[ ] File naming: "n4_compressed.png" and "n4_uncompressed.png"
+
+Verification:
+------------
+[ ] Function is balanced (8 zeros, 8 ones)
+[ ] Circuit produces correct result
+[ ] Diagrams are clear (zoom/scale if needed)
+[ ] All 16 input combinations accounted for
+
+================================================================================
+DELIVERABLES CHECKLIST
+================================================================================
+
+Code Files:
+----------
+[ ] Modified oracle generator function (Problem 1)
+[ ] Implementation for n=3 case (Problem 2)
+[ ] Implementation for n=4 case (Problem 3)
+[ ] All code well-documented with comments
+[ ] Single Python file or Jupyter notebook
+
+Circuit Diagrams:
+----------------
+[ ] n3_compressed.png - Compressed oracle for Problem 2
+[ ] n3_uncompressed.png - Uncompressed oracle for Problem 2
+[ ] n4_compressed.png - Compressed oracle for Problem 4
+[ ] n4_uncompressed.png - Uncompressed oracle for Problem 4
+
+Output/Results:
+--------------
+[ ] Binary string printout for n=3
+[ ] Binary string printout for n=4
+[ ] Verification that both functions are balanced
+[ ] Measurement results showing algorithm success
+
+Documentation:
+-------------
+[ ] README or report explaining approach
+[ ] Any challenges encountered and solutions
+[ ] Verification of correctness
+
+================================================================================
+HELPFUL CODE SNIPPETS
+================================================================================
+
+# Oracle creation template
+def create_oracle_from_binary(binary_string, n_qubits):
+    """
+    Create oracle from binary string representation
+    """
+    if len(binary_string) != 2**n_qubits:
+        raise ValueError("Binary string length must be 2^n_qubits")
+    
+    # Create oracle circuit
+    oracle = QuantumCircuit(n_qubits + 1)
+    
+    # Implement oracle logic here
+    for i, bit in enumerate(binary_string):
+        if bit == '1':
+            # Apply appropriate gates
+            pass
+    
+    return oracle
+
+# Circuit visualization
+circuit.draw(output='mpl', style='compressed')  # For compressed
+circuit.decompose().draw(output='mpl')  # For uncompressed
+
+================================================================================
+COMMON ISSUES AND SOLUTIONS
+================================================================================
+
+1. Oracle not working correctly
+   - Verify bit ordering (LSB vs MSB)
+   - Check control qubit connections
+   - Ensure ancilla qubit initialized properly
+
+2. Circuit too complex to visualize
+   - Use fold parameter in draw()
+   - Scale figure size with matplotlib
+   - Consider partial decomposition
+
+3. Measurement results unexpected
+   - Verify Hadamard gates applied correctly
+   - Check oracle implementation
+   - Ensure proper measurement basis
+
+================================================================================
+GRADING RUBRIC CONSIDERATIONS
+================================================================================
+
+- Correctness of oracle implementation (40%)
+- Quality of circuit diagrams (20%)
+- Code organization and documentation (20%)
+- Proper output and verification (20%)
+
+================================================================================
+SUBMISSION INSTRUCTIONS
+================================================================================
+
+1. [ ] Combine all code into single file or notebook
+2. [ ] Include all circuit diagram images
+3. [ ] Add comments explaining your approach
+4. [ ] Test all functions before submission
+5. [ ] Submit via course management system by Monday, Oct 7
+
+================================================================================
+END OF SPECIFICATION DOCUMENT
+================================================================================
