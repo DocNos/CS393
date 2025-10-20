@@ -1,0 +1,336 @@
+================================================================================
+PROGRAMMING ASSIGNMENT #3 SPECIFICATION - QUANTUM CIRCUITS AND MEASUREMENTS
+================================================================================
+Course: MAT 399A, Fall 2025
+Due Date: Friday, October 31, 2025
+Topic: Quantum Circuit Measurement and Classical Register Probabilities
+
+================================================================================
+ASSIGNMENT OVERVIEW
+================================================================================
+This assignment focuses on understanding quantum measurements 
+and computing probabilities of classical register values. 
+You will implement functions to:
+1. Calculate theoretical probabilities from quantum circuits
+2. Simulate measurements using Qiskit's AerSimulator
+3. Handle circuits with and without ancilla qubits
+4. Map quantum measurements to classical bit registers
+
+================================================================================
+PREREQUISITES CHECKLIST
+================================================================================
+[ ] Python environment with Qiskit installed
+[ ] Understanding of quantum measurement and probability
+[ ] Familiarity with binary representations and bit operations
+[ ] Knowledge of computational basis states |J⟩n notation
+[ ] Understanding of ancilla qubits concept
+[ ] Completed Programming Assignment #2
+
+================================================================================
+FILE STRUCTURE
+================================================================================
+Required Files:
+[ ] exercise3.py - Main implementation file with all four functions
+[ ] exercise3_test.py - Test driver (provided)
+[ ] exercise3_test.output.txt - Expected output reference (provided)
+
+Allowed Imports:
+[ ] numpy
+[ ] qiskit
+[ ] qiskit_aer
+[ ] math
+[ ] cmath
+[ ] NO other imports allowed
+
+================================================================================
+FUNCTION 1: probabilities0(qc)
+================================================================================
+Purpose: Calculate theoretical probabilities for unmeasured circuit without ancillae
+
+Function Header:
+----------------
+def probabilities0(qc):
+    """
+    -- probabilities of classical register values, assuming no ancillae
+    where:
+        qc = Qiskit quantum circuit with no classical bits (unmeasured)
+    assumes:
+        qc.num_clbits == 0
+    returns:
+        list of register probabilities, indexed by register value
+    """
+
+Implementation Requirements:
+---------------------------
+[ ] Extract unitary matrix using qiskit.quantum_info.Operator
+[ ] Apply unitary to initial state |0⟩^n
+[ ] Calculate |amplitude|² for each computational basis state
+[ ] Return list of length 2^n with probabilities
+
+Key Steps (Pseudocode):
+-----------------------
+1. Get unitary matrix: U = qiskit.quantum_info.Operator(qc).to_matrix()
+2. Extract first column (result of U|000...0⟩)
+3. For each amplitude: probability[i] = |U[i,0]|²
+4. Return probability list
+
+Validation Checklist:
+--------------------
+[ ] Function accepts unmeasured circuit (no classical bits)
+[ ] Returns list of correct length (2^n)
+[ ] Probabilities sum to 1.0 (within numerical precision)
+[ ] Handles circuits of various sizes (n=1,2,3,4...)
+
+================================================================================
+FUNCTION 2: measurements0(qc, N)
+================================================================================
+Purpose: Simulate measurements for circuit without ancillae
+
+Function Header:
+----------------
+def measurements0(qc, N):
+    """
+    -- get experimental results of running a quantum circuit with no ancillae
+    where:
+        qc = Qiskit quantum circuit with no classical bits (unmeasured)
+        N = number of shots
+    assumes:
+        qc.num_clbits == 0
+    returns:
+        list of measured register value frequencies, indexed by register value
+    """
+
+Implementation Requirements:
+---------------------------
+[ ] Create measured version of input circuit
+[ ] Add classical bits equal to number of qubits
+[ ] Map all qubits to classical bits
+[ ] Run AerSimulator with N shots
+[ ] Convert results to frequency list
+
+Key Steps (Pseudocode):
+-----------------------
+1. Create measured circuit:
+   n = qc.num_qubits
+   qcm = qiskit.QuantumCircuit(n, n)
+   qcm.compose(qc, range(0,n), inplace=True)
+2. Add measurements:
+   qcm.measure(range(n), range(n))
+3. Run simulation:
+   job = qiskit_aer.AerSimulator().run(qcm, shots=N)
+4. Extract counts:
+   counts = job.result().data()['counts']
+5. Convert hex dictionary to frequency list
+
+Validation Checklist:
+--------------------
+[ ] Creates proper measured circuit
+[ ] Correctly maps qubits to classical bits
+[ ] Handles hex-to-decimal conversion
+[ ] Returns list with sum equal to N
+[ ] Handles missing values (zero frequency outcomes)
+
+================================================================================
+FUNCTION 3: probabilities(qc, qbits, cbits) - CHALLENGE PROBLEM
+================================================================================
+Purpose: Calculate theoretical probabilities with ancillae (partial measurement)
+
+Function Header:
+----------------
+def probabilities(qc, qbits, cbits):
+    """
+    -- probabilities of classical register values, with ancillae
+    where:
+        qc = Qiskit quantum circuit with no classical bits (unmeasured)
+        qbits = list of qubit wire numbers to measure
+        cbits = list of classical bits the qubits are mapped to
+    assumes:
+        qc.num_clbits == 0
+        len(qbits) == len(cbits) == m
+        cbits is a permutation of range(0,m)
+    returns:
+        list of measured register value frequencies, indexed by register value
+    """
+
+Implementation Requirements:
+---------------------------
+[ ] Get unitary matrix and compute full state probabilities
+[ ] Implement mapping function: I = map(J)
+[ ] Sum probabilities for all J that map to same I
+[ ] Handle arbitrary qubit-to-cbit mappings
+[ ] Return list of length 2^m (not 2^n)
+
+Key Algorithm (Pseudocode):
+---------------------------
+1. Get full probabilities (as in probabilities0)
+2. Initialize: cprob = [0] * (2**m)
+3. For each quantum state J in range(2**n):
+   a. Calculate classical register value I:
+      I = 0
+      for i in range(m):
+          if J & (2**qbits[i]) != 0:
+              I += 2**cbits[i]
+   b. Accumulate probability:
+      cprob[I] += qprob[J]
+4. Return cprob
+
+Bit Mapping Logic:
+-----------------
+- Quantum state |J⟩n has bits: Jn-1...J1J0
+- Classical register I has bits: Im-1...I1I0
+- Mapping rule: Ic(i) = Jq(i) for all i
+- Example: qbits=[1,2], cbits=[1,0]
+  * I1 = J1 (qubit 1 → classical bit 1)
+  * I0 = J2 (qubit 2 → classical bit 0)
+
+Validation Checklist:
+--------------------
+[ ] Correctly implements bit mapping
+[ ] Handles permutation of cbits
+[ ] Sums probabilities for equivalent measurements
+[ ] Returns list of length 2^m
+[ ] Total probability sums to 1.0
+
+================================================================================
+FUNCTION 4: measurements(qc, qbits, cbits, N)
+================================================================================
+Purpose: Simulate measurements with ancillae
+
+Function Header:
+----------------
+def measurements(qc, qbits, cbits, N):
+    """
+    -- get experimental results of running a quantum circuit with ancillae
+    where:
+        qc = Qiskit quantum circuit with no classical bits (unmeasured)
+        qbits = list of qubit wire numbers to measure
+        cbits = list of classical bits qubits are mapped to
+        N = number of shots
+    assumes:
+        qc.num_clbits == 0
+        len(qbits) == len(cbits) == m
+        cbits is a permutation of range(0,m)
+    returns:
+        list of measured register value frequencies, indexed by register value
+    """
+
+Implementation Requirements:
+---------------------------
+[ ] Create measured circuit with m classical bits
+[ ] Map only specified qubits to classical bits
+[ ] Use provided qbits/cbits mapping
+[ ] Run simulation and extract frequencies
+[ ] Handle partial measurements correctly
+
+Key Steps (Pseudocode):
+-----------------------
+1. Create measured circuit:
+   n = qc.num_qubits
+   m = len(qbits)
+   qcm = qiskit.QuantumCircuit(n, m)
+   qcm.compose(qc, range(0,n), inplace=True)
+2. Add partial measurements:
+   qcm.measure(qbits, cbits)
+3. Run simulation and extract results (similar to measurements0)
+4. Convert to frequency list of length 2^m
+
+Validation Checklist:
+--------------------
+[ ] Correctly handles partial measurement
+[ ] Uses specified qubit-to-cbit mapping
+[ ] Ancilla qubits remain unmeasured
+[ ] Returns list of length 2^m (not 2^n)
+[ ] Total frequencies sum to N
+
+================================================================================
+TESTING STRATEGY
+================================================================================
+
+Test Cases to Verify:
+--------------------
+[ ] Simple 2-qubit circuits with known outcomes
+[ ] 3-qubit circuit from handout example
+[ ] Circuits with different ancilla configurations
+[ ] Various qubit-to-cbit permutations
+[ ] Edge cases (single qubit, all ancillae, no ancillae)
+
+Expected Behavior:
+-----------------
+[ ] probabilities0 and measurements0 should agree statistically
+[ ] probabilities and measurements should agree statistically
+[ ] Simulated frequencies approach theoretical probabilities as N increases
+[ ] Sum of probabilities = 1.0
+[ ] Sum of frequencies = N
+
+Running Tests:
+-------------
+[ ] Run: python exercise3_test.py
+[ ] Compare output with exercise3_test.output.txt
+[ ] Note: Simulation results vary due to randomness
+[ ] Verify trends match, not exact values for measurements
+
+================================================================================
+COMMON PITFALLS AND TIPS
+================================================================================
+
+Binary/Hex Conversion:
+---------------------
+- Qiskit returns hex strings like '0x2'
+- Convert using: int('0x2', 16) = 2
+- Handle missing values (zero frequency outcomes)
+
+Bit Ordering:
+------------
+- Qiskit uses little-endian for classical bits
+- Qubit |bn-1...b1b0⟩ has b0 as rightmost
+- Test with known simple circuits first
+
+Ancilla Handling:
+----------------
+- Ancillae are unmeasured qubits
+- They still affect the quantum state
+- Only measured qubits contribute to classical register
+
+Probability Calculations:
+------------------------
+- Use np.abs(amplitude)**2 for probability
+- Watch for numerical precision issues
+- Verify probabilities sum to 1.0
+
+================================================================================
+SUBMISSION CHECKLIST
+================================================================================
+
+Code Requirements:
+-----------------
+[ ] All four functions implemented in exercise3.py
+[ ] Only allowed imports used
+[ ] Functions have exact names as specified
+[ ] Docstrings match specification
+[ ] No syntax errors
+
+Functionality:
+-------------
+[ ] probabilities0 works for various circuit sizes
+[ ] measurements0 produces reasonable frequencies
+[ ] probabilities handles ancillae correctly
+[ ] measurements handles partial measurements
+[ ] Test driver produces similar output to reference
+
+Documentation:
+-------------
+[ ] Code is well-commented
+[ ] Complex logic explained
+[ ] Bit mapping clearly documented
+[ ] Variable names are descriptive
+
+Final Checks:
+------------
+[ ] File named exactly: exercise3.py
+[ ] Test with provided test driver
+[ ] Verify output reasonably matches reference
+[ ] Submit before Friday, October 31
+
+================================================================================
+END OF SPECIFICATION DOCUMENT
+================================================================================

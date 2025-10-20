@@ -1,0 +1,103 @@
+================================================================================
+QISKIT FUNCTIONALITY REFERENCE TABLE - MAT 399A Programming Assignment #3
+================================================================================
+
+QUANTUM CIRCUIT CREATION
+--------------------------------------------------------------------------------
+Function/Class                     | Description
+-----------------------------------|--------------------------------------------
+qiskit.QuantumCircuit(n)          | Creates unmeasured circuit with n qubits only
+qiskit.QuantumCircuit(n,m)        | Creates circuit with n qubits and m classical bits
+qc.num_qubits                      | Returns number of qubit wires in circuit
+qc.num_clbits                      | Returns number of classical bits in circuit
+
+QUANTUM GATES
+--------------------------------------------------------------------------------
+Function/Class                     | Description
+-----------------------------------|--------------------------------------------
+qc.h(qubit_list)                  | Apply Hadamard gate to specified qubits
+qc.mcx(control_list, target)      | Multi-controlled X gate (Toffoli for 2 controls)
+qc.x(qubit)                        | Pauli-X gate (NOT gate)
+qc.y(qubit)                        | Pauli-Y gate
+qc.z(qubit)                        | Pauli-Z gate
+qc.cx(control, target)             | Controlled-NOT (CNOT) gate
+
+MEASUREMENT OPERATIONS
+--------------------------------------------------------------------------------
+Function/Class                     | Description
+-----------------------------------|--------------------------------------------
+qc.measure(qubit_list, cbit_list) | Maps qubits to classical bits for measurement
+                                   | - qubit_list: quantum wires to measure
+                                   | - cbit_list: classical bit indices for results
+
+CIRCUIT MANIPULATION
+--------------------------------------------------------------------------------
+Function/Class                     | Description
+-----------------------------------|--------------------------------------------
+qc.compose(other_qc, qubits,      | Combines circuits; copies other_qc into qc
+           inplace=True)           | - qubits: wire mapping (e.g., range(0,n))
+                                   | - inplace: modifies qc directly if True
+qc.draw()                          | Returns text visualization of circuit
+qc.draw(output='mpl')              | Returns matplotlib figure of circuit
+
+QUANTUM INFORMATION
+--------------------------------------------------------------------------------
+Function/Class                     | Description
+-----------------------------------|--------------------------------------------
+qiskit.quantum_info.Operator(qc)  | Converts circuit to operator representation
+.to_matrix()                       | Extracts unitary matrix from operator
+                                   | Returns complex numpy array of shape (2^n, 2^n)
+
+SIMULATION (qiskit_aer)
+--------------------------------------------------------------------------------
+Function/Class                     | Description
+-----------------------------------|--------------------------------------------
+qiskit_aer.AerSimulator()          | Creates quantum circuit simulator instance
+.run(circuit, shots=N)             | Simulates circuit N times
+                                   | Returns job object with results
+job.result()                       | Extracts result object from simulation job
+.data()['counts']                  | Dictionary of measurement outcomes
+                                   | Keys: hex values (e.g., '0x2')
+                                   | Values: frequency of occurrence
+
+PYTHON BIT OPERATIONS
+--------------------------------------------------------------------------------
+Operation                          | Description
+-----------------------------------|--------------------------------------------
+J & 2^i                           | Bitwise AND to check i-th bit of integer J
+                                   | Returns non-zero if bit i is 1
+J = sum(Ji * 2^i)                 | Binary representation of integer J
+bin(J)                            | Convert integer to binary string
+hex(J)                            | Convert integer to hexadecimal string
+int('0x2', 16)                    | Convert hex string to integer
+
+NUMPY OPERATIONS (RELEVANT)
+--------------------------------------------------------------------------------
+Function                          | Description
+-----------------------------------|--------------------------------------------
+np.abs(complex_number)**2         | Probability from complex amplitude
+                                   | |ψ|² gives measurement probability
+np.zeros(2**n)                    | Create array of zeros for probabilities
+array[index] += value             | Accumulate probabilities
+
+KEY CONCEPTS
+--------------------------------------------------------------------------------
+Concept                           | Description
+-----------------------------------|--------------------------------------------
+Computational basis               | Standard basis states |0⟩, |1⟩, |00⟩, |01⟩, etc.
+|J⟩n notation                     | n-qubit state with binary value J
+                                   | Example: |5⟩3 = |101⟩ for 3 qubits
+Ancilla qubit                     | Unmeasured auxiliary qubit in circuit
+Register value                    | Classical bit pattern after measurement
+Shots                            | Number of circuit execution repetitions
+
+BINARY INDEXING CONVENTION
+--------------------------------------------------------------------------------
+Convention                        | Description
+-----------------------------------|--------------------------------------------
+|bn-1...b1b0⟩                     | Qubit ordering: leftmost is highest index
+Jn-1...J1J0                       | Binary representation: J0 is least significant
+Wire numbering                    | Qubits numbered 0 to n-1 (bottom to top)
+Classical bit ordering            | c0 is least significant bit in register
+
+================================================================================

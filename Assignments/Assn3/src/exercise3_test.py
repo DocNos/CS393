@@ -5,7 +5,7 @@ import numpy
 import qiskit
 import qiskit_aer
 
-import exercise3_sol as ex3
+import exercise3 as ex3
 
 
 ###############################################################################
