@@ -37,20 +37,34 @@ def probabilities0(qc):
     #print(col)
     #  |amplitude|² foreach in column
     probU = [np.abs(amplitude)**2 for amplitude in col]
-    #print(probU)
+    # size_ = len(probU)
+    # print(size_)
+    # qbits = qc.num_qubits
+    # print("n = ", qbits)
     return probU
 
 def measurements0(qc, N):
     """
-    -- get experimental results of running a quantum circuit with no ancillae
+    -- get experimental results of running a quantum circuit 
+        with no ancillae
     where:
-        qc = Qiskit quantum circuit with no classical bits (unmeasured)
+        qc = Qiskit quantum circuit with no classical bits 
+        (unmeasured)
         N = number of shots
     assumes:
         qc.num_clbits == 0
     returns:
-        list of measured register value frequencies, indexed by register value
+        list of measured register value frequencies, 
+        indexed by register value
     """
+    # Measured version of input circuit -> construct a 
+    #   quantum circuit with equal classical bits to qbits
+    numQbits = qc.num_qubits
+    qcm = qiskit.QuantumCircuit(numQbits, numQbits)
+    # copy input circuit into measured circuit
+    qcm.compose(qc, range(0, numQbits), inplace= True)
+    print(qcm.draw())
+
 
 def probabilities(qc, qbits, cbits):
     """
@@ -89,7 +103,7 @@ def main():
     qc1 = qiskit.QuantumCircuit(3)
     qc1.h([0,2])
     qc1.mcx([0,2],1)
-    probabilities0(qc1)
+    measurements0(qc1, 0)
     qbits1 = [1,2]
     cbits1 = [0,1]
 
