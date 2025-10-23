@@ -62,10 +62,10 @@ def probabilities0(qc):
 
 Implementation Requirements:
 ---------------------------
-[ ] Extract unitary matrix using qiskit.quantum_info.Operator
-[ ] Apply unitary to initial state |0⟩^n
-[ ] Calculate |amplitude|² for each computational basis state
-[ ] Return list of length 2^n with probabilities
+[x] Extract unitary matrix using qiskit.quantum_info.Operator
+[x] Apply unitary to initial state |0⟩^n
+[x] Calculate |amplitude|² for each computational basis state
+[x] Return list of length 2^n with probabilities
 
 Key Steps (Pseudocode):
 -----------------------
@@ -102,9 +102,9 @@ def measurements0(qc, N):
 
 Implementation Requirements:
 ---------------------------
-[ ] Create measured version of input circuit
-[ ] Add classical bits equal to number of qubits
-[ ] Map all qubits to classical bits
+[x] Create measured version of input circuit
+[x] Add classical bits equal to number of qubits
+[x] Map all qubits to classical bits
 [ ] Run AerSimulator with N shots
 [ ] Convert results to frequency list
 

@@ -1,5 +1,5 @@
 import qiskit
-import qiskit_aer
+from qiskit_aer import AerSimulator
 import math
 import cmath
 import numpy as np
@@ -63,7 +63,19 @@ def measurements0(qc, N):
     qcm = qiskit.QuantumCircuit(numQbits, numQbits)
     # copy input circuit into measured circuit
     qcm.compose(qc, range(0, numQbits), inplace= True)
-    print(qcm.draw())
+    # map qubits to classical bits
+    range_ = range(0, numQbits)
+    print(list(range_))
+    qcm.measure(list(range_)
+                , list(range_))
+    job = AerSimulator().run(qcm, N)
+    result = job.result()
+    # print({result[0].data.meas.get_bitstrings()[:10]})
+    # print(job.result().data().meas.get_bitstrings())
+    #results = job.result().data()[0]
+    #print(results)
+
+
 
 
 def probabilities(qc, qbits, cbits):
@@ -103,7 +115,7 @@ def main():
     qc1 = qiskit.QuantumCircuit(3)
     qc1.h([0,2])
     qc1.mcx([0,2],1)
-    measurements0(qc1, 0)
+    measurements0(qc1, 4)
     qbits1 = [1,2]
     cbits1 = [0,1]
 
