@@ -74,9 +74,51 @@ Given an input state |ψ> = A₀₀|00> + A₀₁|01> + A₁₀|10> + A₁₁|11
 2. **Apply unitary:** ψ_out = U × ψ
 3. **Calculate probabilities:** P(|xy>) = |amplitude_xy|²
 
+=== CNOT Gate Explanation ===                     
 
+     CNOT (Controlled-NOT) is a 2-qubit gate:
+     - Control qubit: if |1>, applies X gate to target
+     - Target qubit: gets X gate applied conditionally
+
+     CNOT_{control,target} notation:
+     - CNOT_{1,0} means control=qubit 1, target=qubit 0
+     - CNOT_{0,1} means control=qubit 0, target=qubit 1
+
+     === Truth Table for CNOT_{1,0} ===
+     Input  ->  Output
+     |00>   ->  |00>   (control=0, no change)
+     |01>   ->  |01>   (control=0, no change)
+     |10>   ->  |11>   (control=1, flip target: 0->1)
+     |11>   ->  |10>   (control=1, flip target: 1->0)
+
+     === Matrix Construction ===
+     Each row shows where each basis state goes:
+     |00> -> |00> (put 1 in row 0, col 0)
+     |01> -> |01> (put 1 in row 1, col 1)
+     |10> -> |11> (put 1 in row 3, col 2)
+     |11> -> |10> (put 1 in row 2, col 3)
+
+     CNOT_{1,0} matrix:
+     [[1 0 0 0]
+      [0 1 0 0]
+      [0 0 0 1]
+      [0 0 1 0]]
 
 ---
+
+     CNOT_{1,0} matrix:
+          |00⟩ |01⟩ |10⟩ |11⟩  <- INPUT states (columns)
+     |00⟩  [1   0   0   0  ]
+     |01⟩  [0   1   0   0  ]
+     |10⟩  [0   0   0   1  ]
+     |11⟩  [0   0   1   0  ]
+     ↑ OUTPUT states (rows)
+
+     Reading the matrix:
+     - Column 0 (input |00⟩): [1,0,0,0] -> goes to |00⟩ with amplitude 1
+     - Column 1 (input |01⟩): [0,1,0,0] -> goes to |01⟩ with amplitude 1
+     - Column 2 (input |10⟩): [0,0,0,1] -> goes to |11⟩ with amplitude 1
+     - Column 3 (input |11⟩): [0,0,1,0] -> goes to |10⟩ with amplitude 1
 
 ## Testing Your Solution
 
