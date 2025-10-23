@@ -20,10 +20,10 @@ def makeU(qc):
 
 def probMap(U, numQbits):
     # U = q1(qc)
-    print(U)
+    # print(U)
     # col index 0, input |0>
     col = U[:, 0]
-    print("\n",col)
+    # print("\n",col)
     #print(col)
     #  |amplitude|² foreach in column
     probU = [float(round(np.abs(amplitude)**2,2)) for amplitude in col]
@@ -62,18 +62,17 @@ def isUnitary(A):
 
 def main():
     qc = qiskit.QuantumCircuit(2)
-    # U = q1(qc)
-    # print("Question 1(a):\n", U)
-    # print("Question 1(b):\n")
-    # isUnitary(U)
-    # print("Question 2:\n", probInput('00', qc))
-    # print("Question 3:\n", probInput('10', qc))
     U = q1(qc)
+    print("Question 1(a):\n", U)
+    print("Question 1(b):\n")
+    isUnitary(U)
+    
+    #U = q1(qc)
     probs = probMap(U, qc.num_qubits)
     prob0 = probs['00']
-    print(prob0)
+    print("Question 2:\n", prob0)
     prob1 = probs['10']
-    print(prob1)
+    print("Question 3:\n", prob1)
     
     return
 
