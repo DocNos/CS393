@@ -1,0 +1,301 @@
+-- Quantum Computing Library for TI-Nspire
+-- Save this as a library document (quantum.tns)
+
+-- ================================
+-- Basic Ket States and Utilities
+-- ================================
+
+-- Define basic single-qubit states as column vectors
+Define ket0() = [[1],[0]]
+Define ket1() = [[0],[1]]
+
+-- Define two-qubit basis states
+Define ket00() = [[1],[0],[0],[0]]
+Define ket01() = [[0],[1],[0],[0]]
+Define ket10() = [[0],[0],[1],[0]]
+Define ket11() = [[0],[0],[0],[1]]
+
+-- Create arbitrary ket from binary string (e.g., "01" -> |01⟩)
+Define ketBin(binStr) = 
+Func
+  Local n,size,vec,idx
+  n:=dim(binStr)
+  size:=2^n
+  vec:=newMat(size,1)
+  idx:=0
+  For i,1,n
+    idx:=idx*2+expr(mid(binStr,i,1))
+  EndFor
+  vec[idx+1,1]:=1
+  Return vec
+EndFunc
+
+-- ================================
+-- Tensor Product Operations
+-- ================================
+
+-- Tensor product for vectors (kronecker product)
+Define tensor(a,b) =
+Func
+  Local m,n,p,q,result
+  m:=rowDim(a)
+  n:=colDim(a)
+  p:=rowDim(b)
+  q:=colDim(b)
+  result:=newMat(m*p,n*q)
+  For i,1,m
+    For j,1,n
+      For k,1,p
+        For l,1,q
+          result[(i-1)*p+k,(j-1)*q+l]:=a[i,j]*b[k,l]
+        EndFor
+      EndFor
+    EndFor
+  EndFor
+  Return result
+EndFunc
+
+-- Shorthand for tensor product
+Define tp(a,b) = tensorProd(a,b)
+
+-- ================================
+-- Single-Qubit Gates (2x2)
+-- ================================
+
+-- Pauli Gates
+Define pX() = [[0,1],[1,0]]
+Define pY() = [[0,-i],[i,0]]
+Define pZ() = [[1,0],[0,-1]]
+
+-- Hadamard Gate
+Define hadamard() = (1/√(2))*[[1,1],[1,-1]]
+Define h() = hadamard()
+
+-- Phase Gate
+Define phaseS() = [[1,0],[0,i]]
+Define phaseT() = [[1,0],[0,e^(i*π/4)]]
+
+-- Rotation Gates
+Define rotX(θ) = [[cos(θ/2),-i*sin(θ/2)],[-i*sin(θ/2),cos(θ/2)]]
+Define rotY(θ) = [[cos(θ/2),-sin(θ/2)],[sin(θ/2),cos(θ/2)]]
+Define rotZ(θ) = [[e^(-i*θ/2),0],[0,e^(i*θ/2)]]
+
+-- ================================
+-- Two-Qubit Gates (4x4)
+-- ================================
+
+-- CNOT Gate (control on first qubit)
+Define cnot() = [[1,0,0,0],[0,1,0,0],[0,0,0,1],[0,0,1,0]]
+Define cx() = cnot()
+
+-- CNOT with control on second qubit
+Define cnotRev() = [[1,0,0,0],[0,0,0,1],[0,0,1,0],[0,1,0,0]]
+
+-- Controlled-Z Gate
+Define cz() = [[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,-1]]
+
+-- Controlled-Y Gate
+Define cy() = [[1,0,0,0],[0,1,0,0],[0,0,0,-i],[0,0,i,0]]
+
+-- SWAP Gate
+Define swap() = [[1,0,0,0],[0,0,1,0],[0,1,0,0],[0,0,0,1]]
+
+-- Controlled Phase Gate
+Define cphase(φ) = [[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,e^(i*φ)]]
+
+-- ================================
+-- Gate Application Functions
+-- ================================
+
+-- Apply single-qubit gate to qubit n in an m-qubit system
+Define applySingleGate(gate,qubitNum,totalQubits) =
+Func
+  Local result,i
+  result:=1
+  For i,1,totalQubits
+    If i=qubitNum Then
+      result:=tensorProd(result,gate)
+    Else
+      result:=tensorProd(result,[[1,0],[0,1]])
+    EndIf
+  EndFor
+  Return result
+EndFunc
+
+-- Apply gate to specific qubit in 2-qubit system
+Define applyToFirst(gate) = tensorProd(gate,[[1,0],[0,1]])
+Define applyToSecond(gate) = tensorProd([[1,0],[0,1]],gate)
+
+-- ================================
+-- Measurement and Probability
+-- ================================
+
+-- Get probability of measuring |0⟩ or |1⟩ for a single qubit
+Define prob0(state) = |state[1,1]|²
+Define prob1(state) = |state[2,1]|²
+
+-- Get probability of specific outcome for multi-qubit state
+Define probOutcome(state,outcome) = |state[outcome+1,1]|²
+
+-- Get all probabilities for a quantum state
+Define getAllProbs(state) =
+Func
+  Local n,probs
+  n:=rowDim(state)
+  probs:=newMat(n,1)
+  For i,1,n
+    probs[i,1]:=|state[i,1]|²
+  EndFor
+  Return probs
+EndFunc
+
+-- ================================
+-- Utility Functions
+-- ================================
+
+-- Normalize a quantum state
+Define normalize(state) =
+Func
+  Local norm
+  norm:=0
+  For i,1,rowDim(state)
+    norm:=norm+|state[i,1]|²
+  EndFor
+  Return state/√(norm)
+EndFunc
+
+-- Create superposition of |0⟩ and |1⟩
+Define superpose(α,β) = normalize([[α],[β]])
+
+-- Create Bell states
+Define bellPhi⁺() = (1/√(2))*(ket00()+ket11())
+Define bellPhi⁻() = (1/√(2))*(ket00()-ket11())
+Define bellPsi⁺() = (1/√(2))*(ket01()+ket10())
+Define bellPsi⁻() = (1/√(2))*(ket01()-ket10())
+
+-- Check if state is entangled (for 2-qubit states)
+Define isEntangled(state) =
+Func
+  Local a,b,c,d
+  a:=state[1,1]
+  b:=state[2,1]
+  c:=state[3,1]
+  d:=state[4,1]
+  Return |a*d-b*c|≠0
+EndFunc
+
+-- Display quantum state in ket notation (for 2-qubit states)
+Define displayKet2(state) =
+Func
+  Local result,coef
+  result:=""
+  For i,1,4
+    coef:=state[i,1]
+    If |coef|>10^(-10) Then
+      If i=1 Then result:=result&string(coef)&"|00⟩"
+      ElseIf i=2 Then result:=result&"+"&string(coef)&"|01⟩"
+      ElseIf i=3 Then result:=result&"+"&string(coef)&"|10⟩"
+      ElseIf i=4 Then result:=result&"+"&string(coef)&"|11⟩"
+      EndIf
+    EndIf
+  EndFor
+  Return result
+EndFunc
+
+-- ================================
+-- Example Circuit Functions
+-- ================================
+
+-- Create EPR pair
+Define makeEPR() =
+Func
+  Local state
+  state:=ket00()
+  state:=applyToFirst(hadamard())*state
+  state:=cnot()*state
+  Return state
+EndFunc
+
+-- Quantum teleportation circuit (partial - measurement not included)
+Define teleportPrep(ψ) =
+Func
+  Local state
+  -- ψ is the state to teleport (2x1 vector)
+  -- Create |ψ⟩|00⟩ initial state
+  state:=tensorProd(ψ,ket00())
+  -- Create EPR pair on qubits 2,3
+  state:=applySingleGate(hadamard(),2,3)*state
+  state:=[[1,0,0,0,0,0,0,0],[0,1,0,0,0,0,0,0],[0,0,0,0,1,0,0,0],[0,0,0,0,0,1,0,0],[0,0,0,1,0,0,0,0],[0,0,0,0,0,0,0,1],[0,0,1,0,0,0,0,0],[0,0,0,0,0,0,1,0]]*state
+  Return state
+EndFunc
+
+-- Grover's algorithm for 2 qubits (searching for |11⟩)
+Define grover2() =
+Func
+  Local state,oracle,diffusion
+  -- Initialize with equal superposition
+  state:=applyToFirst(hadamard())*ket00()
+  state:=applyToSecond(hadamard())*state
+  
+  -- Oracle for |11⟩
+  oracle:=[[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,-1]]
+  
+  -- Diffusion operator
+  diffusion:=2*([[1],[1],[1],[1]]/2)*transpose([[1,1,1,1]])/2-[[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]]
+  
+  -- Apply Grover iteration
+  state:=oracle*state
+  state:=diffusion*state
+  
+  Return state
+EndFunc
+
+-- ================================
+-- Instructions for Use
+-- ================================
+
+Define help() =
+"Quantum Computing Library Functions:
+
+Basic States:
+- ket0(), ket1(): Single qubit states |0⟩, |1⟩
+- ket00(), ket01(), ket10(), ket11(): Two-qubit basis states
+- ketFromBinary('01'): Create ket from binary string
+
+Tensor Products:
+- tensorProd(a,b) or tp(a,b): Tensor product of matrices/vectors
+
+Single-Qubit Gates:
+- pauliX(), pauliY(), pauliZ(): Pauli gates
+- hadamard() or h(): Hadamard gate
+- phaseS(), phaseT(): Phase gates
+- rotX(θ), rotY(θ), rotZ(θ): Rotation gates
+
+Two-Qubit Gates:
+- cnot() or cx(): Controlled-NOT gate
+- cz(): Controlled-Z gate
+- cy(): Controlled-Y gate
+- swap(): SWAP gate
+- cphase(φ): Controlled phase gate
+
+Application:
+- applyToFirst(gate): Apply gate to first qubit of 2-qubit system
+- applyToSecond(gate): Apply gate to second qubit
+- applySingleGate(gate,n,m): Apply to qubit n in m-qubit system
+
+Measurement:
+- prob0(state), prob1(state): Probability of |0⟩ or |1⟩
+- getAllProbs(state): All measurement probabilities
+
+Bell States:
+- bellPhi⁺(), bellPhi⁻(), bellPsi⁺(), bellPsi⁻()
+
+Examples:
+- makeEPR(): Create EPR pair
+- grover2(): Grover's algorithm for 2 qubits
+
+Example Usage:
+state:=ket00()
+state:=applyToFirst(h())*state
+state:=cnot()*state
+getAllProbs(state)"
