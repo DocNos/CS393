@@ -36,11 +36,14 @@ def probabilities0(qc):
     col = U[:,0]
     #print(col)
     #  |amplitude|² foreach in column
-    probU = [np.abs(amplitude)**2 for amplitude in col]
-    # size_ = len(probU)
-    # print(size_)
-    # qbits = qc.num_qubits
-    # print("n = ", qbits)
+    probU = [float(round(np.abs(amplitude)**2,2)) for amplitude in col]
+    n = qc.num_qubits
+    probMap = {}
+    for i, prob in enumerate(probU):        
+        #print("|",format(i, f'0{n}b'),">", ":",prob)
+        currQbit = format(i, f'0{n}b')
+        probMap[currQbit] = float(prob)
+    # print(probMap)
     return probU
 
 def measurements0(qc, N):
@@ -65,15 +68,14 @@ def measurements0(qc, N):
     qcm.compose(qc, range(0, numQbits), inplace= True)
     # map qubits to classical bits
     range_ = range(0, numQbits)
-    print(list(range_))
+    # print(list(range_))
     qcm.measure(list(range_)
                 , list(range_))
-    job = AerSimulator().run(qcm, N)
-    result = job.result()
-    # print({result[0].data.meas.get_bitstrings()[:10]})
-    # print(job.result().data().meas.get_bitstrings())
-    #results = job.result().data()[0]
-    #print(results)
+    job = AerSimulator().run(qcm, shots=N)
+    # print(qcm.draw())
+    results = job.result().data()['counts']
+    return results
+    print(results)
 
 
 
@@ -111,13 +113,13 @@ returns:
     list of measured register value frequencies, indexed by register value
 """
 
-def main():
-    qc1 = qiskit.QuantumCircuit(3)
-    qc1.h([0,2])
-    qc1.mcx([0,2],1)
-    measurements0(qc1, 4)
-    qbits1 = [1,2]
-    cbits1 = [0,1]
-
-if __name__ == "__main__":
-    main()
+#def main():
+#    qc1 = qiskit.QuantumCircuit(3)
+#    qc1.h([0,2])
+#    qc1.mcx([0,2],1)
+#    measurements0(qc1, 4)
+#    qbits1 = [1,2]
+#    cbits1 = [0,1]
+#
+#if __name__ == "__main__":
+#    main()
