@@ -31,12 +31,15 @@ def probabilities0(qc):
         list of register probabilities, indexed by register 
         value
     """
-    U = qiskit.quantum_info.Operator(qc).to_matrix()    
+    U = qiskit.quantum_info.Operator(qc).to_matrix()   
+    print(U) 
     # extract first column directly
     col = U[:,0]
     #print(col)
     #  |amplitude|² foreach in column
+    # round to precision 2 decimal places
     probU = [float(round(np.abs(amplitude)**2,2)) for amplitude in col]
+    #probU = [np.abs(amplitude)**2 for amplitude in col]
     n = qc.num_qubits
     probMap = {}
     for i, prob in enumerate(probU):        
@@ -75,10 +78,30 @@ def measurements0(qc, N):
     # print(qcm.draw())
     results = job.result().data()['counts']
     return results
-    print(results)
+
+# q[1,2] -> c[0, 1]
+#         q1  q2  c0  c1  | out
+# 0 000    0   0   0   0  | 00 |000> -> 00 (0, 0)
+# 1 001    0   0   0   0  | 00 |001> -> 00 (1, 0)
+# 2 010    1   0   1   0  | 01 |010> -> 01 (2, 1)
+# 3 011    1   0   1   0  | 01 |011> -> 01 (3, 1)
+# 4 100    0   1   0   1  | 10 |100> -> 10 (4, 2)
+# 5 101    0   1   0   1  | 10 |101> -> 10 (5, 2)
+# 6 110    1   1   1   1  | 11 |110> -> 11 (6, 3)
+# 7 111    1   1   1   1  | 11 |111> -> 11 (7, 3)
 
 
-
+# iterate through each binary string, build cbit out
+def strAnd(stateBin, map):
+    cbit = [0, 0]
+    print(stateBin)
+    for i, bit in enumerate(stateBin[::-1]):
+        if i in map:
+            print("qbit", i, "(", bit, ")" "mapping to cbit", map[i])
+            cbit[map[i]] = bit
+    cbit.reverse()
+    print(cbit)
+    return cbit
 
 def probabilities(qc, qbits, cbits):
     """
@@ -96,6 +119,39 @@ returns:
     list of measured register value frequencies, 
     indexed by register value
 """
+    # qc1 = qiskit.QuantumCircuit(qbits, cbits)
+    U = qiskit.quantum_info.Operator(qc).to_matrix()
+    # only measure the qbits specified from qbits
+    n = qc.num_qubits
+    m = len(qbits)
+    rows = U[:,0]
+    # Collect all mapped bits
+    dictMap = dict()
+    for i, bit in enumerate(qbits):
+        dictMap[bit] = cbits[i]
+
+    stateBins = []
+    cbitBin = []
+    mapping = {}
+    for i in range(2**n):
+        # convert state indices to binary
+        stateBin_str = format(i, f'0{n}b')
+        stateBins.append(stateBin_str)
+        prob = float(round(np.abs(rows[i]**2),2 ))  
+        cbit = strAnd(stateBin_str, dictMap)
+        cbitBin.append(cbit)
+        mapping[stateBin_str] = cbit
+        
+    print(mapping, dictMap)
+    
+    
+    
+    
+    # Get amplitude of each probability, extracted from first column.
+    # amplitude = |value|²
+    probs = [float(
+            round(np.abs(amplitude)**2, 2 )
+        ) for amplitude in rows]
 
 def measurements(qc, qbits, cbits, N):
     """
@@ -113,13 +169,24 @@ returns:
     list of measured register value frequencies, indexed by register value
 """
 
-#def main():
-#    qc1 = qiskit.QuantumCircuit(3)
-#    qc1.h([0,2])
-#    qc1.mcx([0,2],1)
-#    measurements0(qc1, 4)
-#    qbits1 = [1,2]
-#    cbits1 = [0,1]
-#
-#if __name__ == "__main__":
-#    main()
+
+def main():
+    qc1 = qiskit.QuantumCircuit(3)
+    qc1.h([0,2])
+    qc1.mcx([0,2],1)
+
+    qbits1 = [1,2]
+    cbits1 = [0,1]
+    probabilities(qc1, qbits1, cbits1)
+
+    qc2 = qiskit.QuantumCircuit(2)
+    qc2.h([0,1])
+    qc2.y(0)
+    qc2.cx(1,0)
+    qc2.h(1)
+
+    qbits2 = [0,1]
+    cbits2 = [1,0]
+
+if __name__ == "__main__":
+    main()
