@@ -94,14 +94,15 @@ def measurements0(qc, N):
 # iterate through each binary string, build cbit out
 def strAnd(stateBin, map):
     cbit = [0, 0]
-    print(stateBin)
+    # print(stateBin)
     for i, bit in enumerate(stateBin[::-1]):
         if i in map:
-            print("qbit", i, "(", bit, ")" "mapping to cbit", map[i])
+            # print("qbit", i, "(", bit, ")" "mapping to cbit", map[i])
             cbit[map[i]] = bit
     cbit.reverse()
-    print(cbit)
-    return cbit
+    # print(cbit)
+    cbitStr = ''.join(cbit)
+    return cbitStr
 
 def probabilities(qc, qbits, cbits):
     """
@@ -133,17 +134,26 @@ returns:
     stateBins = []
     cbitBin = []
     mapping = {}
+    probMap = {}
     for i in range(2**n):
         # convert state indices to binary
         stateBin_str = format(i, f'0{n}b')
         stateBins.append(stateBin_str)
-        prob = float(round(np.abs(rows[i]**2),2 ))  
+        prob = float(round(np.abs(rows[i]**2),2 )) 
+        probMap[stateBin_str] = prob 
         cbit = strAnd(stateBin_str, dictMap)
         cbitBin.append(cbit)
         mapping[stateBin_str] = cbit
-        
-    print(mapping, dictMap)
+    # print(mapping, '\n', probMap)
+    probSum = {}
+    # sum all probs of cbits that map to same qbits
+    for i, qbit in enumerate(mapping):
+        if mapping[qbit] not in probSum:
+            probSum[mapping[qbit]] = probMap[qbit]
+        elif mapping[qbit] == probSum[mapping[qbit]]:
+            probSum[mapping[qbit]] += probMap[qbit]
     
+    print(mapping, '\n', probMap, '\n', probSum)
     
     
     
@@ -187,6 +197,7 @@ def main():
 
     qbits2 = [0,1]
     cbits2 = [1,0]
+    probabilities(qc2, qbits2, cbits2)
 
 if __name__ == "__main__":
     main()
