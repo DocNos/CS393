@@ -17,7 +17,6 @@ qc1.mcx([0,2],1)
 qbits1 = [1,2]
 cbits1 = [0,1]
 
-
 qc2 = qiskit.QuantumCircuit(2)
 qc2.h([0,1])
 qc2.y(0)
