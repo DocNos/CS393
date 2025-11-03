@@ -93,7 +93,8 @@ def measurements0(qc, N):
 
 # iterate through each binary string, build cbit out
 def strAnd(stateBin, map):
-    cbit = [0, 0]
+    m = len(map)
+    cbit = ['0'] * m
     # print(stateBin)
     for i, bit in enumerate(stateBin[::-1]):
         if i in map:
@@ -148,20 +149,21 @@ returns:
     probSum = {}
     # sum all probs of cbits that map to same qbits
     for i, qbit in enumerate(mapping):
-        if mapping[qbit] not in probSum:
-            probSum[mapping[qbit]] = probMap[qbit]
-        elif mapping[qbit] == probSum[mapping[qbit]]:
-            probSum[mapping[qbit]] += probMap[qbit]
-    
-    print(mapping, '\n', probMap, '\n', probSum)
-    
-    
-    
-    # Get amplitude of each probability, extracted from first column.
-    # amplitude = |value|²
-    probs = [float(
-            round(np.abs(amplitude)**2, 2 )
-        ) for amplitude in rows]
+        cbit_index = mapping[qbit]
+        # print(mapping[qbit], probSum[cbit_index])
+        if cbit_index in probSum:
+            # print("Adding:", probSum[cbit_index] + probMap[qbit])
+            probSum[cbit_index] += probMap[qbit]            
+        else:
+            # print("New prob:", probMap[qbit])
+            probSum[cbit_index] = probMap[qbit]
+    # print(probSum)
+    probs = [0.0] * (2**m)
+    for cbit_str, prob in probSum.items():
+        index = int(cbit_str, 2)
+        probs[index] = prob
+    # print(probs)
+    return probs
 
 def measurements(qc, qbits, cbits, N):
     """
@@ -178,26 +180,37 @@ assumes:
 returns:
     list of measured register value frequencies, indexed by register value
 """
+    numQbits = qc.num_qubits
+    numMeasured = len(qbits)
+    qc1 = qiskit.QuantumCircuit(numQbits, numMeasured)
 
+    qc1.compose(qc, range(0, numQbits), inplace=True)
+    measurement = qc1.measure(qbits, cbits)
 
-def main():
-    qc1 = qiskit.QuantumCircuit(3)
-    qc1.h([0,2])
-    qc1.mcx([0,2],1)
+    job = AerSimulator().run(qc1, shots=N)
+    results = job.result().data()['counts']
+    # print(results)
+    return results
 
-    qbits1 = [1,2]
-    cbits1 = [0,1]
-    probabilities(qc1, qbits1, cbits1)
-
-    qc2 = qiskit.QuantumCircuit(2)
-    qc2.h([0,1])
-    qc2.y(0)
-    qc2.cx(1,0)
-    qc2.h(1)
-
-    qbits2 = [0,1]
-    cbits2 = [1,0]
-    probabilities(qc2, qbits2, cbits2)
-
-if __name__ == "__main__":
-    main()
+# def main():
+#     qc1 = qiskit.QuantumCircuit(3)
+#     qc1.h([0,2])
+#     qc1.mcx([0,2],1)
+# 
+#     qbits1 = [1,2]
+#     cbits1 = [0,1]
+#     probabilities(qc1, qbits1, cbits1)
+#     measurements(qc1, qbits1, cbits1, 1000)
+# 
+#     qc2 = qiskit.QuantumCircuit(2)
+#     qc2.h([0,1])
+#     qc2.y(0)
+#     qc2.cx(1,0)
+#     qc2.h(1)
+# 
+#     qbits2 = [0,1]
+#     cbits2 = [1,0]
+#     probabilities(qc2, qbits2, cbits2)
+# 
+# if __name__ == "__main__":
+#     main()
