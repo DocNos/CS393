@@ -23,7 +23,9 @@ def dj_standard(numQubits):
         replace=False,  # makes sure states are only sampled once
     )
  
+    
     def add_cx(qc_dj, bit_string):
+        print(bit_string)
         for qubit, bit in enumerate(reversed(bit_string)):
             if bit == "1":
                 qc_dj.x(qubit)
@@ -112,15 +114,19 @@ def binaryOracle(binaryString, numQbits):
         return qc_in
 
     onMultiControl(qc, numQbits, binaryString, True)
-    qc.draw()
-    qc.draw(output='mpl', filename=f'n{numQbits}_compressed.png')
-    qc.decompose().draw(output='mpl', filename=f'n{numQbits}_uncompressed.png')
+    print(qc.draw())
+    # qc.draw(output='mpl', filename=f'n{numQbits}_compressed.png')
+    # qc.decompose().draw(output='mpl', filename=f'n{numQbits}_uncompressed.png')
 
 
 def main():
-    binaryOracle("11001100", 3)
+    print(dj_standard(2).draw())
+
+    binaryOracle("1100", 2)
+
+    # binaryOracle("11001100", 3)
     #print(dj_standard(4))
-    binaryOracle("1100110011001100", 4)
+    # binaryOracle("1100110011001100", 4)
 
 if __name__ == "__main__":
     main()
