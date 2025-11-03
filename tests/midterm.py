@@ -162,8 +162,11 @@ def isUnitary(A):
         print(" A† @ A:\n", product, file=f)
     return np.allclose(product, iden, atol = 1e-10)
 
+
+
 def main():
-    if(True):
+    num = 3
+    if(num == 1):
         qc = qiskit.QuantumCircuit(2)
         U = q1(qc)
         with open("output_q1.txt", "a") as f:
@@ -179,14 +182,15 @@ def main():
         print("Question 2:\n", prob0)
         prob1 = probs['10']
         print("Question 3:\n", prob1)
-    else:
+    elif(num == 2):
         qc = qiskit.QuantumCircuit(3)
         U = q4(qc)
         with open("output_q4.txt", "a") as f:
             probs = probMap(U, qc.num_qubits)
             print("Probabilities for input |000>:", probs, file=f)
         isUnitary(U)
-        
+    elif(num == 3):
+
         
         
     return

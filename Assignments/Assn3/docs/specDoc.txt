@@ -105,8 +105,8 @@ Implementation Requirements:
 [x] Create measured version of input circuit
 [x] Add classical bits equal to number of qubits
 [x] Map all qubits to classical bits
-[ ] Run AerSimulator with N shots
-[ ] Convert results to frequency list
+[x] Run AerSimulator with N shots
+[x] Convert results to frequency list
 
 Key Steps (Pseudocode):
 -----------------------
@@ -154,11 +154,11 @@ def probabilities(qc, qbits, cbits):
 
 Implementation Requirements:
 ---------------------------
-[ ] Get unitary matrix and compute full state probabilities
-[ ] Implement mapping function: I = map(J)
-[ ] Sum probabilities for all J that map to same I
-[ ] Handle arbitrary qubit-to-cbit mappings
-[ ] Return list of length 2^m (not 2^n)
+[x] Get unitary matrix and compute full state probabilities
+[x] Implement mapping function: I = map(J)
+[x] Sum probabilities for all J that map to same I
+[x] Handle arbitrary qubit-to-cbit mappings
+[x] Return list of length 2^m (not 2^n)
 
 Key Algorithm (Pseudocode):
 ---------------------------
