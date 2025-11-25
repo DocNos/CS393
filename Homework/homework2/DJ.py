@@ -53,7 +53,7 @@ input string should be length 2^numQbits
 
     this string represents the "truth table" of the oracle.
 '''
-def binaryOracle(binaryString, numQbits):
+def binaryOracle(binaryString, numQbits, doBarrier):
     # input hardcoded, unecessary checks added to practice py syntax.
     if not all(bit in '01' for bit in binaryString): 
         print("binary string must contain only binary digits")
@@ -113,20 +113,47 @@ def binaryOracle(binaryString, numQbits):
                 onCX(qc_in, stateBinary)
         return qc_in
 
-    onMultiControl(qc, numQbits, binaryString, True)
-    print(qc.draw())
-    # qc.draw(output='mpl', filename=f'n{numQbits}_compressed.png')
-    # qc.decompose().draw(output='mpl', filename=f'n{numQbits}_uncompressed.png')
-
-
+    onMultiControl(qc, numQbits, binaryString, doBarrier)
+    return qc
+ 
 def main():
-    print(dj_standard(2).draw())
+    # Open a file to write the output
+    with open("oracle_circuits.txt", "w") as f:
+        # Example for n=2
+        # f.write("="*50 + "\n")
+        # f.write("Example: n=2, binary string: 1100\n")
+        # f.write("="*50 + "\n")
+        # qc = binaryOracle("1100", 2, True)
+        # f.write(str(qc.draw()) + "\n")
 
-    binaryOracle("1100", 2)
+        # For n=3: binary string 11001100
+        f.write("\n" + "="*50 + "\n")
+        f.write("n=3: binary string 11001100 (UNCOMPRESSED)\n")
+        f.write("="*50 + "\n")
+        qc_3_uncomp = binaryOracle("11001100", 3, True)
+        f.write(str(qc_3_uncomp.draw()) + "\n")
 
-    # binaryOracle("11001100", 3)
-    #print(dj_standard(4))
-    # binaryOracle("1100110011001100", 4)
+        f.write("\n" + "="*50 + "\n")
+        f.write("n=3: binary string 11001100 (COMPRESSED)\n")
+        f.write("="*50 + "\n")
+        # For compressed version, set barrier to False
+        qc_3_comp = binaryOracle("11001100", 3, False)
+        f.write(str(qc_3_comp.draw()) + "\n")
+
+        # For n=4: binary string 1100110011001100
+        f.write("\n" + "="*50 + "\n")
+        f.write("n=4: binary string 1100110011001100 (UNCOMPRESSED)\n")
+        f.write("="*50 + "\n")
+        qc_4_uncomp = binaryOracle("1100110011001100", 4, True)
+        f.write(str(qc_4_uncomp.draw()) + "\n")
+
+        f.write("\n" + "="*50 + "\n")
+        f.write("n=4: binary string 1100110011001100 (COMPRESSED)\n")
+        f.write("="*50 + "\n")
+        qc_4_comp = binaryOracle("1100110011001100", 4, False)
+        f.write(str(qc_4_comp.draw()) + "\n")
+
+    print("Circuit diagrams have been written to oracle_circuits.txt")
 
 if __name__ == "__main__":
     main()
