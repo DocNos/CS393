@@ -1,0 +1,109 @@
+SSH PASSPHRASE CACHING OPTIONS FOR GITHUB
+==========================================
+
+OPTION 1: Add to ssh-agent (Session-based)
+-------------------------------------------
+Cache passphrase for current terminal session only.
+
+Commands:
+    # Start ssh-agent
+    eval "$(ssh-agent -s)"
+
+    # Add your SSH key (enter passphrase once)
+    ssh-add ~/.ssh/id_ed25519
+
+Notes:
+- Passphrase cached until you close the terminal
+- Need to re-run after each new terminal session
+- Most secure option (passphrase expires frequently)
+
+
+OPTION 2: Persistent ssh-agent (RECOMMENDED for WSL2)
+------------------------------------------------------
+Auto-start agent and prompt for passphrase once per system boot.
+
+Setup:
+1. Open your shell config file:
+    nano ~/.bashrc    # for bash
+    nano ~/.zshrc     # for zsh
+
+2. Add this code to the end of the file:
+
+    # Auto-start ssh-agent and load keys
+    if [ -z "$SSH_AUTH_SOCK" ]; then
+       eval "$(ssh-agent -s)" > /dev/null
+       ssh-add ~/.ssh/id_ed25519 2>/dev/null
+    fi
+
+3. Reload the config:
+    source ~/.bashrc    # or source ~/.zshrc
+
+Notes:
+- Enter passphrase once per system boot
+- Good balance of security and convenience
+- Recommended option
+
+
+OPTION 3: Generate key WITHOUT passphrase (Less secure)
+--------------------------------------------------------
+No passphrase to enter, but less secure if key file is compromised.
+
+Commands:
+    # Generate new SSH key
+    ssh-keygen -t ed25519 -C "your_email@example.com"
+
+    # When prompted for passphrase, press Enter twice (leave blank)
+
+Notes:
+- No passphrase needed for any git operation
+- If someone gets your private key file, they have full access
+- Use only if convenience > security for your use case
+
+
+COMPLETE SSH SETUP FOR GITHUB
+==============================
+
+1. Generate SSH key (if you don't have one):
+    ssh-keygen -t ed25519 -C "your_email@example.com"
+
+2. Copy your public key:
+    cat ~/.ssh/id_ed25519.pub
+
+3. Add to GitHub:
+    - Go to: https://github.com/settings/ssh/new
+    - Paste the public key
+    - Give it a title (e.g., "WSL2 - Laptop")
+
+4. Switch your repo to SSH:
+    cd /home/nitro-bun/cs399/CS393/Homework/homework2
+    git remote set-url origin git@github.com:DocNos/CS393.git
+
+5. Test connection:
+    ssh -T git@github.com
+
+6. Choose a passphrase caching option (see above)
+
+
+TROUBLESHOOTING
+===============
+
+Check if ssh-agent is running:
+    ps aux | grep ssh-agent
+
+List currently loaded keys:
+    ssh-add -l
+
+Remove all cached keys:
+    ssh-add -D
+
+Verify remote URL is using SSH:
+    git remote -v
+    # Should show: git@github.com:username/repo.git
+
+
+SECURITY COMPARISON
+===================
+
+Most Secure  → Option 1 (Session-based)
+Balanced     → Option 2 (Persistent agent) ★ RECOMMENDED
+Least Secure → Option 3 (No passphrase)
